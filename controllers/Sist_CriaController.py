@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from marshmallow import ValidationError
 
 from models.Sist_Cria import Sist_CriaSchema
-from services.Sist_CriaService import Sist_CriaService
+from service.Sist_CriaService import Sist_CriaService
 
 sist_cria_bp = Blueprint('sist_cria',__name__, url_prefix='/sist_cria')
 
@@ -19,7 +19,7 @@ def getByIdSist_Cria(id: int):
 
 @sist_cria_bp.get("/")
 def getsist_criacoes():
-    sist_cria= Sist_CriaService().getALL()
+    sist_cria= Sist_CriaService().getAll()
     return [sc.toDict() for sc in sist_cria],200
 
 

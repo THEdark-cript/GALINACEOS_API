@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from marshmallow import ValidationError
 
 from models.Nom_Terr import Nom_TerrSchema
-from services.Nom_TerrService import Nom_TerrService
+from service.Nom_TerrService import Nom_TerrService
 
 nom_terr_bp = Blueprint('nom_terr', __name__, url_prefix='/nom_terr')
 
@@ -15,7 +15,7 @@ def getByIdNom_Terr(id: int):
 
 @nom_terr_bp.get("/")
 def getNom_Terr():
-    nom_terr = Nom_TerrService().getALL()
+    nom_terr = Nom_TerrService().getAll()
     return [nt.toDict() for nt in nom_terr], 200
 
 @nom_terr_bp.post("/")

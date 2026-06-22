@@ -1,5 +1,5 @@
 import psycopg2
-from helpers.environment import environment
+from helpers.enviroment import environment
 from helpers.logger import logger
 
 # Lê variáveis de ambiente (do .env ou config)

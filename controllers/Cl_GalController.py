@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from marshmallow import ValidationError
 
 from models.Cl_Gal import Cl_GalSchema
-from services.Cl_GalService import Cl_GalService
+from service.Cl_GalService import Cl_GalService
 
 cl_gal_bp = Blueprint('cl_gal', __name__, url_prefix='/cl_gal')
 
@@ -15,7 +15,7 @@ def getByIdCl_Gal(id: int):
 
 @cl_gal_bp.get("/")
 def getCl_Gal():
-    cl_gal = Cl_GalService().getALL()
+    cl_gal = Cl_GalService().getAll()
     return [cg.toDict() for cg in cl_gal], 200
 
 @cl_gal_bp.post("/")
