@@ -4,6 +4,7 @@ from controllers.Nom_TerrController import nom_terr_bp
 from controllers.Niv_TerrController import niv_terr_bp
 from controllers.Cod_TerrController import cod_terr_bp
 from controllers.Cl_GalController import cl_gal_bp
+from controllers.Galinaceos_Controller import galinaceos_bp 
 
 
 
@@ -22,3 +23,4 @@ app.register_blueprint(nom_terr_bp)
 app.register_blueprint(niv_terr_bp)
 app.register_blueprint(cod_terr_bp)
 app.register_blueprint(cl_gal_bp)
+app.register_blueprint(galinaceos_bp)

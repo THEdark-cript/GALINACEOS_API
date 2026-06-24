@@ -3,3 +3,5 @@ marshmallow==4.3.0
 python-dotenv==1.2.2
 flask-cors==6.0.2
 psycopg2-binary==2.9.12
+pandas==3.0.3
+numpy==2.5.0
