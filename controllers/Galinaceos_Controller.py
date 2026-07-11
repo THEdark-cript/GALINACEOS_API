@@ -9,16 +9,16 @@ def get_galinaceos():
     try:
         filters = {}
 
-        if request.args.get('sist_cria'):
-            filters['sist_cria'] = request.args.get('sist_cria')
-        if request.args.get('niv_terr'):
-            filters['niv_terr'] = request.args.get('niv_terr')
-        if request.args.get('cod_terr'):
-            filters['cod_terr'] = request.args.get('cod_terr')
-        if request.args.get('nom_terr'):
-            filters['nom_terr'] = request.args.get('nom_terr')
-        if request.args.get('cl_gal'):
-            filters['cl_gal'] = request.args.get('cl_gal')
+        if request.args.get('SIST_CRIA'):
+            filters['sist_cria'] = request.args.get('SIST_CRIA')
+        if request.args.get('NIV_TERR'):
+            filters['niv_terr'] = request.args.get('NIV_TERR')
+        if request.args.get('COD_TERR'):
+            filters['cod_terr'] = request.args.get('COD_TERR')
+        if request.args.get('NOM_TERR'):
+            filters['nom_terr'] = request.args.get('NOM_TERR')
+        if request.args.get('CL_GAL'):
+            filters['cl_gal'] = request.args.get('CL_GAL')
 
         galinaceos = service.get_by_filters(filters)
         resultado = [g.toDict() for g in galinaceos]
