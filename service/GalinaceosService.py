@@ -1,25 +1,28 @@
-from models.Galinaceos import Galinaceos
+from helpers.logger import logger
 from repository.GalinaceosRepository import GalinaceosRepository
+from models.Galinaceos import Galinaceo
 
-def rowToGalinaceos(row):
-    return Galinaceos(*row)
+def rowToGalinaceo(row):
+    return Galinaceo(
+        row[0],  # id
+        row[1],  # sist_cria
+        row[2],  # niv_terr
+        row[3],  # cod_terr
+        row[4],  # nom_terr
+        row[5],  # cl_gal
+        row[6],  # nom_cl_gal
+        row[7]   # gal_total
+    )
 
 class GalinaceosService:
     def __init__(self):
         self.repository = GalinaceosRepository()
 
-    def get_by_filters(self, filters):
-        # Converter valores textuais em IDs
-        if filters.get("sist_cria"):
-            filters["sist_cria"] = self.repository.get_id("sist_cria", "sigla", filters["sist_cria"])
-        if filters.get("niv_terr"):
-            filters["niv_terr"] = self.repository.get_id("niv_terr", "sigla", filters["niv_terr"])
-        if filters.get("cod_terr"):
-            filters["cod_terr"] = self.repository.get_id("cod_terr", "codigo", filters["cod_terr"])
-        if filters.get("nom_terr"):
-            filters["nom_terr"] = self.repository.get_id("nom_terr", "nome", filters["nom_terr"])
-        if filters.get("cl_gal"):
-            filters["cl_gal"] = self.repository.get_id("cl_gal", "sigla", filters["cl_gal"])
+    def getAll(self, filtros=None):
+        rows = self.repository.getAll(filtros)
+        logger.info(f"Serviço: Retornando {len(rows)} registros de galináceos com filtros: {filtros}")
+        return [rowToGalinaceo(r) for r in rows]
 
-        rows = self.repository.get_by_filters(filters)
-        return [rowToGalinaceos(row) for row in rows]
+    def getById(self, id):
+        row = self.repository.getById(id)
+        return rowToGalinaceo(row) if row is not None else None

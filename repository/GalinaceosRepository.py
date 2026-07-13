@@ -1,40 +1,42 @@
 from helpers.database import get_conn
 
 class GalinaceosRepository:
-    def get_id(self, table, column, value):
+    def getAll(self, filtros=None):
         conn = get_conn()
-        cur = conn.cursor()
-        cur.execute(f"SELECT id FROM {table} WHERE {column} = %s", (value,))
-        row = cur.fetchone()
-        cur.close()
-        return row[0] if row else None
+        cursor = conn.cursor()
+        
+        query = """
+        SELECT id, sist_cria, niv_terr, cod_terr, nom_terr, cl_gal, nom_cl_gal, gal_total
+        FROM galinaceos
+        """
+        
+        condicoes = []
+        valores = []
+        
+        if filtros:
+            campos_filtraveis = ['sist_cria', 'niv_terr', 'cod_terr', 'nom_terr', 'cl_gal']
+            
+            for campo in campos_filtraveis:
+                valor = filtros.get(campo)
+                if valor:
+                    condicoes.append(f"{campo} = %s")
+                    valores.append(valor)
+        
+        if condicoes:
+            query += " WHERE " + " AND ".join(condicoes)
+            
+        cursor.execute(query, tuple(valores))
+        return cursor.fetchall()
 
-    def get_by_filters(self, filters):
+    def getById(self, id):
         conn = get_conn()
-        cur = conn.cursor()
-
-        query = "SELECT * FROM galinaceos WHERE 1=1"
-        params = []
-
-        if filters.get('sist_cria'):
-            query += " AND sist_cria = %s"
-            params.append(filters['sist_cria'])
-        if filters.get('niv_terr'):
-            query += " AND niv_terr = %s"
-            params.append(filters['niv_terr'])
-        if filters.get('cod_terr'):
-            query += " AND cod_terr = %s"
-            params.append(filters['cod_terr'])
-        if filters.get('nom_terr'):
-            query += " AND nom_terr = %s"
-            params.append(filters['nom_terr'])
-        if filters.get('cl_gal'):
-            query += " AND cl_gal = %s"
-            params.append(filters['cl_gal'])
-
-        query += " LIMIT 100"
-
-        cur.execute(query, params)
-        rows = cur.fetchall()
-        cur.close()
-        return rows
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            SELECT id, sist_cria, niv_terr, cod_terr, nom_terr, cl_gal, nom_cl_gal, gal_total
+            FROM galinaceos
+            WHERE id = %s
+            """, 
+            (id,)
+        )
+        return cursor.fetchone()

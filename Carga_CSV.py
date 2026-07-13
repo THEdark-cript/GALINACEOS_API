@@ -1,85 +1,60 @@
 import pandas as pd
 import numpy as np
-import psycopg2
-from psycopg2.extras import execute_values
+from helpers.application import app
+from helpers.database import get_conn
 
+def extrair_e_carregar():
+    print("Lendo o arquivo GALINACEOS.csv com Pandas")
 
-conn = psycopg2.connect(
-    dbname="galinaceos",
-    user="postgres",
-    password="123456",   
-    host="localhost",
-    port="5435"
-)
-cur = conn.cursor()
+    # Lê o CSV com separador ';' e mantém tudo como string inicialmente
+    df = pd.read_csv('GALINACEOS.csv', sep=';', dtype=str, keep_default_na=False)
 
+    # Substitui valores vazios ou 'X' por NaN
+    df = df.replace(r'^\s*$', np.nan, regex=True)
+    df = df.replace('X', np.nan)
 
-df = pd.read_csv("GALINACEOS.csv", sep=";", dtype=str)
-df.replace({"X": np.nan, "": np.nan}, inplace=True)
+    # Remove pontos de separação de milhares em GAL_TOTAL
+    if 'GAL_TOTAL' in df.columns:
+        df['GAL_TOTAL'] = df['GAL_TOTAL'].str.replace('.', '', regex=False)
 
+    with app.app_context():
+        conn = get_conn()
+        cursor = conn.cursor()
 
-if "NOM_CL_GAL" in df.columns:
-    df.drop(columns=["NOM_CL_GAL"], inplace=True)
+        print("Removendo duplicatas")
+        cursor.execute("TRUNCATE TABLE galinaceos RESTART IDENTITY;")
 
+        print("Colocando dados no postgres")
+        query_insert = """
+            INSERT INTO galinaceos (sist_cria, niv_terr, cod_terr, nom_terr, cl_gal, nom_cl_gal, gal_total)
+            VALUES (%s, %s, %s, %s, %s, %s, %s);
+        """
 
-df.rename(columns={
-    "SIST_CRIA": "sist_cria",
-    "NIV_TERR": "niv_terr",
-    "COD_TERR": "cod_terr",
-    "NOM_TERR": "nom_terr",
-    "CL_GAL": "cl_gal"
-}, inplace=True)
+        inseridos = 0
+        for _, row in df.iterrows():
+            gal_total_val = None
+            if pd.notna(row['GAL_TOTAL']):
+                try:
+                    gal_total_val = int(row['GAL_TOTAL'])
+                except ValueError:
+                    gal_total_val = None
 
+            valores = (
+                str(row['SIST_CRIA']) if pd.notna(row['SIST_CRIA']) else None,
+                str(row['NIV_TERR']) if pd.notna(row['NIV_TERR']) else None,
+                str(row['COD_TERR']) if pd.notna(row['COD_TERR']) else None,
+                str(row['NOM_TERR']) if pd.notna(row['NOM_TERR']) else None,
+                str(row['CL_GAL']) if pd.notna(row['CL_GAL']) else None,
+                str(row['NOM_CL_GAL']) if pd.notna(row['NOM_CL_GAL']) else None,
+                gal_total_val
+            )
 
-def insert_unique(table, column, values):
-    for v in values.unique():
-        if pd.notna(v):
-            cur.execute(f"INSERT INTO {table} ({column}) VALUES (%s) ON CONFLICT DO NOTHING;", (v,))
-    conn.commit()
+            cursor.execute(query_insert, valores)
+            inseridos += 1
 
-insert_unique("sist_cria", "sigla", df["sist_cria"])
-insert_unique("niv_terr", "sigla", df["niv_terr"])
-insert_unique("cod_terr", "codigo", df["cod_terr"])
-insert_unique("nom_terr", "nome", df["nom_terr"])
-insert_unique("cl_gal", "sigla", df["cl_gal"])
+        conn.commit()
+        cursor.close()
+        print(f"Sucesso total! {inseridos} registros Carregados no banco com sucesso...")
 
-
-def build_map(table, column):
-    cur.execute(f"SELECT id, {column} FROM {table};")
-    rows = cur.fetchall()
-    return {r[1]: r[0] for r in rows}
-
-map_sist = build_map("sist_cria", "sigla")
-map_niv = build_map("niv_terr", "sigla")
-map_cod = build_map("cod_terr", "codigo")
-map_nom = build_map("nom_terr", "nome")
-map_cl = build_map("cl_gal", "sigla")
-
-
-df["sist_cria"] = df["sist_cria"].map(map_sist)
-df["niv_terr"] = df["niv_terr"].map(map_niv)
-df["cod_terr"] = df["cod_terr"].map(map_cod)
-df["nom_terr"] = df["nom_terr"].map(map_nom)
-df["cl_gal"] = df["cl_gal"].map(map_cl)
-
-
-for col in df.columns[5:]:
-    df[col] = pd.to_numeric(df[col], errors="coerce")
-
-
-values = [
-    tuple(None if pd.isna(v) else (int(v) if isinstance(v, np.integer) else float(v) if isinstance(v, np.floating) else str(v))
-          for v in row)
-    for row in df.to_numpy()
-]
-
-
-cols = ",".join(df.columns)
-insert_sql = f"INSERT INTO galinaceos ({cols}) VALUES %s"
-execute_values(cur, insert_sql, values, page_size=1000)
-conn.commit()
-
-cur.close()
-conn.close()
-
-print("Carga concluída com sucesso!")
+if __name__ == "__main__":
+    extrair_e_carregar()
