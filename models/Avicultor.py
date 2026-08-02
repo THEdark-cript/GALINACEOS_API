@@ -2,9 +2,8 @@ from typing import List
 from marshmallow import Schema, fields, validate
 from flask_restful import fields as dto
 
-from datetime import datetime
-from sqlalchemy import DateTime
-from sqlalchemy import String
+from datetime import date
+from sqlalchemy import Date, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from helpers.database import db
@@ -13,7 +12,7 @@ from helpers.database import db
 avicultor_fields = {
     'id': dto.Integer,
     'nome': dto.String,
-    'nascimento': dto.DateTime(dt_format='iso8601'),
+    'nascimento': dto.String,
     'cpf': dto.String,
     'caf': dto.String,
 }
@@ -28,7 +27,7 @@ class Avicultor(db.Model):
 
     id: Mapped[int] = mapped_column("id", primary_key=True)
     nome: Mapped[str] = mapped_column("nome", String())
-    nascimento: Mapped[datetime] = mapped_column("nascimento", DateTime)
+    nascimento: Mapped[date] = mapped_column("nascimento", Date)
     cpf: Mapped[str] = mapped_column("cpf", String(11))
     caf: Mapped[str] = mapped_column("caf", String())
 
@@ -45,7 +44,8 @@ class Avicultor(db.Model):
         self.caf = caf
 
     def toDict(self):
-        return {"id": self.id, "nome": self.nome, "nascimento": self.nascimento, "cpf": self.cpf, "caf": self.caf}
+        nascimento = self.nascimento.isoformat() if isinstance(self.nascimento, date) else self.nascimento
+        return {"id": self.id, "nome": self.nome, "nascimento": nascimento, "cpf": self.cpf, "caf": self.caf}
 
 
 class AvicultorSchema(Schema):

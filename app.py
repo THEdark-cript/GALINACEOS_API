@@ -3,8 +3,13 @@ from helpers.database import db
 
 # Controllers RESTful
 from controllers.AvicultorController import AvicultoresController, AvicultorController
+
 from controllers.EnderecoController import EnderecosController, EnderecoController
+
 from controllers.IndexController import IndexController, HealthController
+
+from controllers.AvicolaController import AvicolasController,AvicolaController
+
 from controllers.Galinaceos_Controller import galinaceos_bp
 
 
@@ -18,6 +23,9 @@ api.add_resource(AvicultorController, "/avicultores/<int:avicultor_id>")
 
 api.add_resource(EnderecosController, "/enderecos")
 api.add_resource(EnderecoController, "/enderecos/<int:endereco_id>")
+
+api.add_resource(AvicolasController, "/avicolas")
+api.add_resource(AvicolaController, "/avicolas/<int:avicola_id>")
 
 app.register_blueprint(galinaceos_bp)
 
