@@ -5,3 +5,5 @@ flask-cors==6.0.2
 psycopg2-binary==2.9.12
 pandas==3.0.3
 numpy==2.5.0
+Flask-RESTful==0.3.10
+Flask-SQLAlchemy==3.1.1
