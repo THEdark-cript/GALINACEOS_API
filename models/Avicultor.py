@@ -31,7 +31,7 @@ class Avicultor(db.Model):
     cpf: Mapped[str] = mapped_column("cpf", String(11))
     caf: Mapped[str] = mapped_column("caf", String())
 
-    # Referencia entre os objetos.
+    
     enderecos: Mapped[List["Endereco"]] = relationship(
         back_populates="avicultor", cascade="all, delete-orphan"
     )
