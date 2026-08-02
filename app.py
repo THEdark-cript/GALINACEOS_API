@@ -14,7 +14,7 @@ from controllers.AviarioController import AviariosController, AviarioController
 
 from controllers.GalpaoController import GalpoesController, GalpaoController
 
-from controllers.Galinaceos_Controller import galinaceos_bp
+from controllers.Galinaceos_Controller import GalinaceosController, GalinaceoController
 
 
 
@@ -37,7 +37,8 @@ api.add_resource(AviarioController, "/aviarios/<int:aviario_id>")
 api.add_resource(GalpoesController, "/galpoes")
 api.add_resource(GalpaoController, "/galpoes/<int:galpao_id>")
 
-app.register_blueprint(galinaceos_bp)
+api.add_resource(GalinaceosController, "/galinaceos")
+api.add_resource(GalinaceoController, "/galinaceos/<int:galinaceo_id>")
 
 with app.app_context():
     db.create_all()

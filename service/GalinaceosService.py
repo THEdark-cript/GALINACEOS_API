@@ -1,28 +1,39 @@
 from helpers.logger import logger
 from repository.GalinaceosRepository import GalinaceosRepository
-from models.Galinaceos import Galinaceo
 
-def rowToGalinaceo(row):
-    return Galinaceo(
-        row[0],  # id
-        row[1],  # sist_cria
-        row[2],  # niv_terr
-        row[3],  # cod_terr
-        row[4],  # nom_terr
-        row[5],  # cl_gal
-        row[6],  # nom_cl_gal
-        row[7]   # gal_total
-    )
-
-class GalinaceosService:
+class GalinaceosService():
     def __init__(self):
-        self.repository = GalinaceosRepository()
+        self.repo = GalinaceosRepository()
 
-    def getAll(self, filtros=None):
-        rows = self.repository.getAll(filtros)
-        logger.info(f"Serviço: Retornando {len(rows)} registros de galináceos com filtros: {filtros}")
-        return [rowToGalinaceo(r) for r in rows]
+    def getAll(self, filtros: dict = None):
+        registros = self.repo.getAll(filtros)
+        logger.info(f"Retornando {len(registros)} galináceos")
+        return registros
 
     def getById(self, id):
-        row = self.repository.getById(id)
-        return rowToGalinaceo(row) if row is not None else None
+        registo = self.repo.getById(id)
+        logger.info("Lendo informações do resultado da consulta ao banco")
+        return registo
+
+    def create(self, data):
+        galinaceo = self.repo.insert(
+            data["sist_cria"], data["niv_terr"], data.get("cod_terr"),
+            data["nom_terr"], data["cl_gal"], data["nom_cl_gal"], data.get("gal_total")
+        )
+        logger.info(f"Galináceo criado com id: {galinaceo.id}")
+        return galinaceo
+
+    def update(self, id, data):
+        galinaceo = self.repo.update(
+            id, data["sist_cria"], data["niv_terr"], data.get("cod_terr"),
+            data["nom_terr"], data["cl_gal"], data["nom_cl_gal"], data.get("gal_total")
+        )
+        if galinaceo is None:
+            return None
+        logger.info(f"Galináceo {id} atualizado")
+        return galinaceo
+
+    def delete(self, id):
+        removido = self.repo.delete(id)
+        logger.info(f"Galináceo {id} removido: {removido}")
+        return removido
