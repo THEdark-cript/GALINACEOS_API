@@ -5,6 +5,7 @@ from models.Galpao import Galpao
 
 class GalpaoRepository():
     def getAll(self, filtros: dict = None):
+        logger.info("Trazendo galpões")
         stmt = select(Galpao)
         if filtros:
             stmt = stmt.filter_by(**filtros)
@@ -20,21 +21,3 @@ class GalpaoRepository():
         db.session.commit()
         logger.info(f"Galpão inserido com id: {galpao.id}")
         return galpao
-
-    def update(self, id, nome, capacidade, avicola_id):
-        galpao = db.session.get(Galpao, id)
-        if galpao is None:
-            return None
-        galpao.nome = nome
-        galpao.capacidade = capacidade
-        galpao.avicola_id = avicola_id
-        db.session.commit()
-        return galpao
-
-    def delete(self, id):
-        galpao = db.session.get(Galpao, id)
-        if galpao is None:
-            return False
-        db.session.delete(galpao)
-        db.session.commit()
-        return True

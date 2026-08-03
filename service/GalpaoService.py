@@ -21,17 +21,3 @@ class GalpaoService():
         )
         logger.info(f"Galpão criado com id: {galpao.id}")
         return galpao
-
-    def update(self, id, data):
-        galpao = self.galpaoRepository.update(
-            id, data["nome"], data["capacidade"], data["avicola_id"]
-        )
-        if galpao is None:
-            return None
-        logger.info(f"Galpão {id} atualizado")
-        return galpao
-
-    def delete(self, id):
-        removido = self.galpaoRepository.delete(id)
-        logger.info(f"Galpão {id} removido: {removido}")
-        return removido

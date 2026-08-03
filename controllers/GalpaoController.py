@@ -31,20 +31,3 @@ class GalpaoController(Resource):
         if galpao is None:
             return {"mensagem": "Galpão não encontrado"}, 404
         return marshal(galpao, galpao_fields), 200
-
-    def put(self, galpao_id):
-        try:
-            data = GalpaoSchema().load(request.get_json())
-            galpao = GalpaoService().update(galpao_id, data)
-            if galpao is None:
-                return {"mensagem": "Galpão não encontrado"}, 404
-            return marshal(galpao, galpao_fields), 200
-        except ValidationError as err:
-            return jsonify(err.messages), 400
-
-    def delete(self, galpao_id):
-        logger.info(f"Removendo galpão id: {galpao_id}")
-        removido = GalpaoService().delete(galpao_id)
-        if not removido:
-            return {"mensagem": "Galpão não encontrado"}, 404
-        return {"mensagem": "Galpão removido com sucesso!"}, 200

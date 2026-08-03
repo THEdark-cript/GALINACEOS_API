@@ -43,11 +43,3 @@ CREATE TABLE IF NOT EXISTS tb_galpoes (
     avicola_id INTEGER,
     FOREIGN KEY (avicola_id) REFERENCES tb_avicolas(id)
 )
-
-CREATE TABLE IF NOT EXISTS tb_aviarios (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nome TEXT NOT NULL,
-    capacidade INTEGER NOT NULL,
-    galpao_id INTEGER,
-    FOREIGN KEY (galpao_id) REFERENCES tb_galpoes(id)
-);
